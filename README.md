@@ -79,13 +79,20 @@ Server will start on [http://localhost:3000](http://localhost:3000) by default.
 
 ### 7. Frontend setup:
 
-- Login page  
-- Signup page  
-- Request Access  
-- Review All Previous Requests  
-- Pending Request page  
-- All Requests  
-- Create Software page  
+- Login page
+<img src="./software-access-client/src/assets/r1.jpg" alt="Login" width="640" height="400"/>
+- Signup page
+<img src="./software-access-client/src/assets/r2.jpg" alt="Signup" width="640" height="400"/> 
+- Request Access
+<img src="./software-access-client/src/assets/r3.jpg" alt="Request Access" width="640" height="400"/> 
+- Review All Previous Requests
+<img src="./software-access-client/src/assets/r4.jpg" alt="Previous Request" width="640" height="400"/>
+- Pending Request page
+<img src="./software-access-client/src/assets/r5.jpg" alt="Pending Request" width="640" height="400"/>
+- All Requests
+<img src="./software-access-client/src/assets/r6.jpg" alt="All Request" width="640" height="400"/>
+- Create Software page
+<img src="./software-access-client/src/assets/r7.jpg" alt="Create Software" width="640" height="400"/>
 
 ---
 
