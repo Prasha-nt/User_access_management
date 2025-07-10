@@ -125,7 +125,7 @@ app.use(express.json());
 // Initialize TypeORM Data Source (connecting to the database)
 AppDataSource.initialize()
   .then(() => {
-    console.log("✅ Connected to Supabase PostgreSQL (via IPv4 preference). Data Source initialized.");
+    console.log("✅ Connected to railway PostgreSQL (via IPv4 preference). Data Source initialized.");
 
     // Mount your API routes after successful database connection
     app.use("/api/auth", authRoutes);
@@ -143,7 +143,7 @@ AppDataSource.initialize()
     });
   })
   .catch((err) => {
-    console.error("❌ Error connecting to Supabase or initializing Data Source:", err);
+    console.error("❌ Error connecting to railway or initializing Data Source:", err);
     // IMPORTANT: Do NOT use process.exit(1) here in a web server.
     // If the database connection fails, log the error but allow the process to continue.
     // This helps Render's health checks to see the server trying to bind to a port,
