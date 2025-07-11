@@ -101,63 +101,131 @@
 // or keep it for local development purposes.
 // require("dotenv").config();
 
-require("dotenv").config(); // Keep this for local development
+// require("dotenv").config(); // Keep this for local development
+
+// const express = require("express");
+// const cors = require("cors");
+// const { AppDataSource } = require("./config/ormconfig");
+
+// // Import your routes
+// const authRoutes = require("./routes/auth.routes");
+// const softwareRoutes = require("./routes/software.routes");
+// const requestRoutes = require("./routes/request.routes");
+
+// const app = express();
+
+// // ✅ Allow both local and Vercel frontend
+// const allowedOrigins = [
+//   'http://localhost:5173',
+//   'https://user-access-management-sand.vercel.app', // Vercel deployed frontend
+// ];
+
+// // ✅ Configure CORS
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     // Allow requests with no origin (like Postman or curl)
+//     if (!origin) return callback(null, true);
+
+//     if (allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('❌ Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true,
+// }));
+
+// // ✅ Middleware to parse incoming JSON
+// app.use(express.json());
+
+// // ✅ Initialize database connection using TypeORM
+// AppDataSource.initialize()
+//   .then(() => {
+//     console.log("✅ Connected to PostgreSQL and initialized data source");
+
+//     // ✅ Mount API routes
+//     app.use("/api/auth", authRoutes);
+//     app.use("/api/software", softwareRoutes);
+//     app.use("/api/requests", requestRoutes);
+//     app.use("/api/my-requests", requestRoutes); // Optional alias
+
+//     // ✅ Start the server
+//     const PORT = process.env.PORT || 3000;
+//     app.listen(PORT, () => {
+//       console.log(`🚀 Server running at http://localhost:${PORT}`);
+//     });
+//   })
+//   .catch((err) => {
+//     console.error("❌ Error initializing Data Source:", err);
+//     // Do NOT call process.exit here; let Render see the server attempt
+//   });
+
+// module.exports = { app, AppDataSource };
+
+
+
+
+
+
+
+
+
+require("dotenv").config(); // Load environment variables
 
 const express = require("express");
 const cors = require("cors");
 const { AppDataSource } = require("./config/ormconfig");
 
-// Import your routes
+// Import routes
 const authRoutes = require("./routes/auth.routes");
 const softwareRoutes = require("./routes/software.routes");
 const requestRoutes = require("./routes/request.routes");
 
 const app = express();
 
-// ✅ Allow both local and Vercel frontend
+// ✅ Allowed origins from env + localhost for dev
 const allowedOrigins = [
-  'http://localhost:5173',
-  'https://user-access-management-sand.vercel.app', // Vercel deployed frontend
+  process.env.CLIENT_ORIGIN, // e.g., https://user-access-management-sand.vercel.app
+  'http://localhost:5173',   // for local dev
 ];
 
-// ✅ Configure CORS
+// ✅ CORS middleware
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like Postman or curl)
-    if (!origin) return callback(null, true);
-
+    if (!origin) return callback(null, true); // Allow tools like Postman or curl
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
+      return callback(null, true);
     } else {
-      callback(new Error('❌ Not allowed by CORS'));
+      return callback(new Error(`❌ Not allowed by CORS: ${origin}`));
     }
   },
   credentials: true,
 }));
 
-// ✅ Middleware to parse incoming JSON
+// ✅ Middleware to parse JSON
 app.use(express.json());
 
-// ✅ Initialize database connection using TypeORM
+// ✅ Initialize DB and start server
 AppDataSource.initialize()
   .then(() => {
     console.log("✅ Connected to PostgreSQL and initialized data source");
 
-    // ✅ Mount API routes
+    // Mount routes
     app.use("/api/auth", authRoutes);
     app.use("/api/software", softwareRoutes);
     app.use("/api/requests", requestRoutes);
-    app.use("/api/my-requests", requestRoutes); // Optional alias
+    app.use("/api/my-requests", requestRoutes); // alias for user requests
 
-    // ✅ Start the server
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`🚀 Server running at http://localhost:${PORT}`);
+      console.log(`🌐 Allowed origins: ${allowedOrigins.join(', ')}`);
     });
   })
   .catch((err) => {
     console.error("❌ Error initializing Data Source:", err);
-    // Do NOT call process.exit here; let Render see the server attempt
+    // Don't exit, let Render retry health check
   });
 
 module.exports = { app, AppDataSource };
+
