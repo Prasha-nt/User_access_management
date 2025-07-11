@@ -8,31 +8,22 @@ const PendingRequests = () => {
   const [message, setMessage] = useState('');
   const [showAll, setShowAll] = useState(false);
 
-  if (!role || !['Manager', 'Admin', 'Employee'].includes(role)) {
-    return (
-      <div style={styles.pageWrapper}>
-        <p style={styles.accessDenied}>Access denied.</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchRequests();
+  }, [showAll]);
 
   const fetchRequests = async () => {
     try {
       const res = await api.get('/requests');
-      if (showAll) {
-        setRequests(res.data.requests);
-      } else {
-        setRequests(res.data.requests.filter(r => r.status === 'Pending'));
-      }
+      const filtered = showAll
+        ? res.data.requests
+        : res.data.requests.filter(r => r.status === 'Pending');
+      setRequests(filtered);
       setMessage('');
     } catch (error) {
       setMessage('Error fetching requests');
     }
   };
-
-  useEffect(() => {
-    fetchRequests();
-  }, [showAll]);
 
   const handleUpdateStatus = async (id, status) => {
     try {
@@ -61,10 +52,20 @@ const PendingRequests = () => {
     }
   };
 
+  if (!role || !['Manager', 'Admin', 'Employee'].includes(role)) {
+    return (
+      <div style={styles.pageWrapper}>
+        <p style={styles.accessDenied}>Access denied.</p>
+      </div>
+    );
+  }
+
   return (
     <div style={styles.pageWrapper}>
       <div style={styles.container}>
-        <h2 style={styles.title}>{showAll ? 'All Requests' : 'Pending Requests'}</h2>
+        <h2 style={styles.title}>
+          {showAll ? 'All Requests' : 'Pending Requests'}
+        </h2>
 
         <button
           onClick={() => setShowAll(!showAll)}
@@ -112,22 +113,39 @@ const PendingRequests = () => {
                     <td style={styles.td}>{req.software?.name}</td>
                     <td style={styles.td}>{req.accessType}</td>
                     <td style={styles.td}>{req.reason}</td>
-                    <td style={{ ...styles.td, ...styles.statusBadge, ...getStatusBadgeStyle(req.status) }}>
+                    <td
+                      style={{
+                        ...styles.td,
+                        ...styles.statusBadge,
+                        ...getStatusBadgeStyle(req.status),
+                      }}
+                    >
                       {req.status}
                     </td>
                     <td style={styles.td}>
-                      {(role === 'Admin' || role === 'Manager') && req.status === 'Pending' ? (
+                      {(role === 'Admin' || role === 'Manager') &&
+                      req.status === 'Pending' ? (
                         <>
                           <button
-                            onClick={() => handleUpdateStatus(req.id, 'Approved')}
-                            style={{ ...styles.actionButton, ...styles.approveButton }}
+                            onClick={() =>
+                              handleUpdateStatus(req.id, 'Approved')
+                            }
+                            style={{
+                              ...styles.actionButton,
+                              ...styles.approveButton,
+                            }}
                             aria-label={`Approve request ${req.id}`}
                           >
                             Approve
                           </button>{' '}
                           <button
-                            onClick={() => handleUpdateStatus(req.id, 'Rejected')}
-                            style={{ ...styles.actionButton, ...styles.rejectButton }}
+                            onClick={() =>
+                              handleUpdateStatus(req.id, 'Rejected')
+                            }
+                            style={{
+                              ...styles.actionButton,
+                              ...styles.rejectButton,
+                            }}
                             aria-label={`Reject request ${req.id}`}
                           >
                             Reject
@@ -151,27 +169,26 @@ const PendingRequests = () => {
 const styles = {
   pageWrapper: {
     minHeight: '100vh',
-    width: '100vw',
+    width: '100%',
     backgroundColor: '#f7fafc',
-    padding: '40px 60px',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    padding: '20px 10px',
     boxSizing: 'border-box',
   },
   container: {
     width: '100%',
-    maxWidth: '100%', // full width container
+    maxWidth: 1200,
+    margin: '0 auto',
     backgroundColor: 'white',
     borderRadius: 10,
-    padding: '30px 40px',
+    padding: '20px',
     boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-    overflowX: 'auto', // allow horizontal scroll if needed on small screens
   },
   title: {
-    marginBottom: 20,
-    color: '#34495e',
-    fontWeight: '700',
-    fontSize: '28px',
     textAlign: 'center',
+    marginBottom: 20,
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#34495e',
   },
   toggleButton: {
     backgroundColor: '#5d0076',
@@ -181,23 +198,21 @@ const styles = {
     padding: '10px 20px',
     cursor: 'pointer',
     fontWeight: '600',
-    marginBottom: 20,
-    transition: 'background-color 0.3s ease',
     display: 'block',
-    marginLeft: 'auto',
-    marginRight: 'auto',
+    margin: '0 auto 20px',
+    transition: 'background-color 0.3s ease',
   },
   errorMessage: {
     color: '#e74c3c',
     fontWeight: '600',
-    marginBottom: 15,
     textAlign: 'center',
+    marginBottom: 15,
   },
   successMessage: {
     color: '#27ae60',
     fontWeight: '600',
-    marginBottom: 15,
     textAlign: 'center',
+    marginBottom: 15,
   },
   noDataMessage: {
     textAlign: 'center',
@@ -207,40 +222,41 @@ const styles = {
   },
   tableWrapper: {
     width: '100%',
-    overflowX: 'auto', // horizontal scroll if table is too wide
+    overflowX: 'auto',
   },
   table: {
     width: '100%',
+    tableLayout: 'auto',
     borderCollapse: 'collapse',
-    fontSize: '15px',
+    fontSize: '14px',
     color: '#2c3e50',
-    minWidth: 800, // ensure min width so table columns don't get too narrow
   },
   th: {
     borderBottom: '2px solid #bdc3c7',
-    padding: '12px 15px',
-    textAlign: 'left',
+    padding: '12px 10px',
     backgroundColor: '#ecf0f1',
-    whiteSpace: 'nowrap',
+    textAlign: 'left',
+    whiteSpace: 'normal',
+    wordWrap: 'break-word',
   },
   tr: {
     transition: 'background-color 0.3s ease',
   },
   td: {
-    padding: '12px 15px',
+    padding: '10px',
     borderBottom: '1px solid #ecf0f1',
-    verticalAlign: 'middle',
-    whiteSpace: 'nowrap',
+    verticalAlign: 'top',
+    whiteSpace: 'normal',
+    wordBreak: 'break-word',
   },
   actionButton: {
-    padding: '6px 14px',
+    padding: '6px 12px',
     borderRadius: 5,
     border: 'none',
     cursor: 'pointer',
     fontWeight: '600',
-    fontSize: '14px',
-    marginRight: 8,
-    transition: 'background-color 0.3s ease',
+    fontSize: '13px',
+    marginRight: 6,
   },
   approveButton: {
     backgroundColor: '#27ae60',
@@ -251,25 +267,26 @@ const styles = {
     color: 'white',
   },
   statusBadge: {
-    padding: '5px 12px',
+    padding: '6px 10px',
     borderRadius: 10,
-    display: 'inline-block',
     fontWeight: '700',
     textAlign: 'center',
-    marginTop: 6,  // <-- add this line
-
     minWidth: 80,
+    display: 'inline-block',
+    verticalAlign: 'middle',  // ✅ ensures vertical alignment
+    marginTop: 9          // ✅ remove any vertical offset
   },
+  
   readOnlyText: {
     color: '#7f8c8d',
     fontStyle: 'italic',
     fontWeight: '600',
   },
   accessDenied: {
+    textAlign: 'center',
     color: '#e74c3c',
     fontSize: '18px',
     fontWeight: '700',
-    textAlign: 'center',
     marginTop: 50,
   },
 };

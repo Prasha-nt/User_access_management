@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../services/api';
 
@@ -21,7 +21,7 @@ const Signup = () => {
     e.preventDefault();
     setError('');
     try {
-      const res = await axios.post('/auth/signup', form);
+      await axios.post('/auth/signup', form);
       alert('Signup successful! Please login.');
       navigate('/login');
     } catch (err) {
@@ -29,10 +29,18 @@ const Signup = () => {
     }
   };
 
+  // Remove scrollbar (for this page only)
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
-    <div style={styles.pageWrapper}>
-      <div style={styles.container}>
-        <h2>Sign Up</h2>
+    <div style={styles.wrapper}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Create Your Account</h2>
         {error && <p style={styles.error}>{error}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
@@ -71,7 +79,7 @@ const Signup = () => {
           >
             <option value="Employee">Employee</option>
             <option value="Manager">Manager</option>
-            <option value="Admin">Admin</option> {/* to check only later remove this */}
+            <option value="Admin">Admin</option>
           </select>
           <button type="submit" style={styles.button}>Sign Up</button>
         </form>
@@ -81,56 +89,76 @@ const Signup = () => {
 };
 
 const styles = {
-  pageWrapper: {
+  wrapper: {
     height: '100vh',
     width: '100vw',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#ffffff',
+    fontFamily: 'Poppins, sans-serif',
+    padding: '16px',
+    boxSizing: 'border-box',
   },
-  container: {
+  card: {
     width: '100%',
-    maxWidth: '450px',
-    padding: '40px 50px',
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    maxWidth: '480px',
+    backgroundColor: '#ffffff',
+    borderRadius: '14px',
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.1)',
+    padding: '36px 28px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: '24px',
+  },
+  error: {
+    color: '#e74c3c',
+    fontWeight: 500,
+    marginBottom: '12px',
     textAlign: 'center',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px',
-  },
-  error: {
-    color: '#e74c3c',
-    fontWeight: '600',
+    gap: '16px',
   },
   input: {
     padding: '12px 16px',
-    fontSize: '16px',
-    borderRadius: '6px',
+    fontSize: '15px',
+    borderRadius: '8px',
     border: '1.5px solid #ccc',
+    backgroundColor: '#fff',
+    color: '#333',
+    outline: 'none',
+    transition: 'border-color 0.2s ease-in-out',
   },
   select: {
     padding: '12px 16px',
-    fontSize: '16px',
-    borderRadius: '6px',
+    fontSize: '15px',
+    borderRadius: '8px',
     border: '1.5px solid #ccc',
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
+    color: '#333',
+    appearance: 'none',
+    outline: 'none',
   },
   button: {
     padding: '14px',
-    backgroundColor: '#5d0076',
+    background: 'linear-gradient(to right, #9b1d9b, #5d0076)',
     border: 'none',
     borderRadius: '8px',
-    color: 'white',
-    fontSize: '18px',
+    color: '#ffffff',
+    fontSize: '16px',
     fontWeight: '600',
     cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
+    transition: 'background 0.3s ease',
   },
 };
 

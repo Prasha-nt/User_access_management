@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -12,9 +12,16 @@ const CreateSoftware = () => {
   const { role } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   if (!role || role !== 'Admin') {
     return (
-      <div style={styles.pageWrapper}>
+      <div style={styles.wrapper}>
         <p style={{ color: '#e74c3c', fontSize: '18px' }}>
           Access denied. Only Admins can access this page.
         </p>
@@ -24,11 +31,9 @@ const CreateSoftware = () => {
 
   const handleCheckboxChange = (e) => {
     const { value, checked } = e.target;
-    if (checked) {
-      setAccessLevels(prev => [...prev, value]);
-    } else {
-      setAccessLevels(prev => prev.filter(level => level !== value));
-    }
+    setAccessLevels(prev =>
+      checked ? [...prev, value] : prev.filter(level => level !== value)
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -51,13 +56,17 @@ const CreateSoftware = () => {
   };
 
   return (
-    <div style={styles.pageWrapper}>
-      <div style={styles.container}>
+    <div style={styles.wrapper}>
+      <div style={styles.card}>
         <h2 style={styles.title}>Create New Software</h2>
-        {message && <p style={message.includes('successfully') ? styles.success : styles.error}>{message}</p>}
+        {message && (
+          <p style={message.includes('successfully') ? styles.success : styles.error}>
+            {message}
+          </p>
+        )}
         <form onSubmit={handleSubmit} style={styles.form}>
           <label style={styles.label}>
-            Name:
+            Name
             <input
               type="text"
               value={name}
@@ -68,17 +77,17 @@ const CreateSoftware = () => {
           </label>
 
           <label style={styles.label}>
-            Description:
+            Description
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               required
-              style={{ ...styles.input, height: '100px', resize: 'vertical' }}
+              style={styles.textarea}
             />
           </label>
 
           <fieldset style={styles.fieldset}>
-            <legend style={styles.legend}>Access Levels:</legend>
+            <legend style={styles.legend}>Access Levels</legend>
             {['Read', 'Write', 'Admin'].map(level => (
               <label key={level} style={styles.checkboxLabel}>
                 <input
@@ -86,7 +95,10 @@ const CreateSoftware = () => {
                   value={level}
                   checked={accessLevels.includes(level)}
                   onChange={handleCheckboxChange}
-                  style={styles.checkbox}
+                  style={{
+                    ...styles.checkbox,
+                    ...(accessLevels.includes(level) ? styles.checkedCheckbox : {})
+                  }}
                 />
                 {level}
               </label>
@@ -101,102 +113,129 @@ const CreateSoftware = () => {
 };
 
 const styles = {
-  pageWrapper: {
+  wrapper: {
     height: '100vh',
-    width: '98vw',
-    backgroundColor: '#f0f2f5',
+    width: '100vw',
+    backgroundColor: '#ffffff',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    padding: '20px',
-  },
-  container: {
-    backgroundColor: '#fff',
-    padding: '40px 50px',
-    borderRadius: '10px',
-    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-    maxWidth: '600px',
-    marginTop: '30px',
-    width: '100%',
+    padding: '16px',
     boxSizing: 'border-box',
-    textAlign: 'center',
+    fontFamily: 'Poppins, sans-serif',
+  },
+  card: {
+    width: '100%',
+    maxWidth: '600px',
+    backgroundColor: '#fff',
+    borderRadius: '14px',
+    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+    padding: '36px 30px',
   },
   title: {
-    marginBottom: '25px',
+    fontSize: '24px',
     fontWeight: '700',
     color: '#333',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    textAlign: 'left',
-  },
-  label: {
-    fontWeight: '600',
-    color: '#555',
-    display: 'flex',
-    flexDirection: 'column',
-    fontSize: '16px',
-  },
-  input: {
-    marginTop: '8px',
-    padding: '12px 16px',
-    fontSize: '16px',
-    borderRadius: '6px',
-    border: '1.5px solid #ccc',
-    outline: 'none',
-    transition: 'border-color 0.3s ease',
-  },
-  inputFocus: {
-    borderColor: '#4a90e2',
-  },
-  fieldset: {
-    border: 'none',
-    padding: 0,
-    marginTop: '10px',
-  },
-  legend: {
-    fontWeight: '600',
-    marginBottom: '10px',
-    fontSize: '16px',
-    color: '#555',
-  },
-  checkboxLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    marginBottom: '10px',
-    fontSize: '15px',
-    color: '#333',
-    cursor: 'pointer',
-  },
-  checkbox: {
-    width: '18px',
-    height: '18px',
-    cursor: 'pointer',
-  },
-  button: {
-    padding: '14px',
-    backgroundColor: '#5d0076',
-    border: 'none',
-    borderRadius: '8px',
-    color: 'white',
-    fontSize: '18px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
+    marginBottom: '20px',
+    textAlign: 'center',
   },
   success: {
     color: '#27ae60',
     fontWeight: '600',
     marginBottom: '15px',
+    textAlign: 'center',
   },
   error: {
     color: '#e74c3c',
     fontWeight: '600',
     marginBottom: '15px',
+    textAlign: 'center',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '18px',
+  },
+  label: {
+    fontWeight: '500',
+    fontSize: '16px',
+    color: '#555',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+  },
+  input: {
+    padding: '12px 16px',
+    fontSize: '15px',
+    borderRadius: '8px',
+    border: '1.5px solid #ccc',
+    backgroundColor: '#fff',
+    outline: 'none',
+    color: '#333',
+    transition: 'border 0.2s ease',
+  },
+  textarea: {
+    padding: '12px 16px',
+    fontSize: '15px',
+    borderRadius: '8px',
+    border: '1.5px solid #ccc',
+    backgroundColor: '#fff',
+    color: '#333',
+    outline: 'none',
+    resize: 'vertical',
+    minHeight: '80px',
+  },
+  fieldset: {
+    border: 'none',
+    padding: '0',
+    marginTop: '5px',
+  },
+  legend: {
+    fontWeight: '600',
+    fontSize: '16px',
+    color: '#555',
+    marginBottom: '10px',
+  },
+  checkboxLabel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '15px',
+    color: '#333',
+    marginBottom: '10px',
+    position: 'relative',
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
+  checkbox: {
+    appearance: 'none',
+    width: '20px',
+    height: '20px',
+    border: '2px solid #5d0076',
+    borderRadius: '4px',
+    display: 'inline-block',
+    position: 'relative',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s ease',
+  },
+  checkedCheckbox: {
+    backgroundColor: '#5d0076',
+    borderColor: '#5d0076',
+    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20 6 9 17 4 12' /%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    backgroundSize: '14px',
+  },
+  button: {
+    padding: '14px',
+    background: 'linear-gradient(to right, #9b1d9b, #5d0076)',
+    border: 'none',
+    borderRadius: '8px',
+    color: '#fff',
+    fontSize: '16px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    transition: 'background 0.3s ease',
   },
 };
 

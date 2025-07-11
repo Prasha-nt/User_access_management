@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -33,10 +33,18 @@ const Login = () => {
     }
   };
 
+  // Disable scrollbars
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
-    <div style={styles.pageWrapper}>
-      <div style={styles.container}>
-        <h2>Login</h2>
+    <div style={styles.wrapper}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Login</h2>
         {error && <p style={styles.error}>{error}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
@@ -67,49 +75,63 @@ const Login = () => {
 };
 
 const styles = {
-  pageWrapper: {
+  wrapper: {
     height: '100vh',
     width: '100vw',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f0f2f5',
+    backgroundColor: '#ffffff',
+    padding: '16px',
+    boxSizing: 'border-box',
+    fontFamily: 'Poppins, sans-serif',
   },
-  container: {
+  card: {
     width: '100%',
-    maxWidth: '450px',
-    padding: '40px 50px',
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    boxShadow: '0 8px 25px rgba(0,0,0,0.15)',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    maxWidth: '480px',
+    backgroundColor: '#ffffff',
+    borderRadius: '14px',
+    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08)',
+    padding: '36px 28px',
+  },
+  title: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: '24px',
+  },
+  error: {
+    color: '#e74c3c',
+    fontWeight: 500,
+    marginBottom: '12px',
     textAlign: 'center',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px',
-  },
-  error: {
-    color: '#e74c3c',
-    fontWeight: '600',
+    gap: '16px',
   },
   input: {
     padding: '12px 16px',
     fontSize: '16px',
-    borderRadius: '6px',
+    borderRadius: '8px',
     border: '1.5px solid #ccc',
+    backgroundColor: '#fff',
+    color: '#333',
+    outline: 'none',
+    transition: 'border-color 0.2s ease-in-out',
   },
   button: {
     padding: '14px',
-    backgroundColor: '#5d0076',
+    background: 'linear-gradient(to right, #9b1d9b, #5d0076)',
     border: 'none',
     borderRadius: '8px',
     color: 'white',
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: '600',
     cursor: 'pointer',
-    transition: 'background-color 0.3s ease',
+    transition: 'background 0.3s ease',
   },
 };
 
