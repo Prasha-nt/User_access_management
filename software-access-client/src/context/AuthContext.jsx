@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
@@ -44,4 +43,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// ✅ Correct export of useAuth hook
 export const useAuth = () => useContext(AuthContext);
