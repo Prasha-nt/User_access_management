@@ -16,7 +16,10 @@ const AppDataSource = new DataSource({
   migrations: [],
   subscribers: [],
 
-  ssl: false,
+  // Enable SSL/TLS for PostgreSQL (required by Render)
+  ssl: process.env.DATABASE_URL && (process.env.DATABASE_URL.includes("localhost") || process.env.DATABASE_URL.includes("127.0.0.1")) ? false : {
+    rejectUnauthorized: false
+  }
 });
 
 module.exports = { AppDataSource };
