@@ -5,6 +5,11 @@ const User = require("../entities/User");
 const Software = require("../entities/Software");
 const Request = require("../entities/Request");
 
+const isLocal = process.env.DATABASE_URL &&
+  (process.env.DATABASE_URL.includes("localhost") || process.env.DATABASE_URL.includes("127.0.0.1"));
+
+const sslConfig = isLocal ? false : { rejectUnauthorized: false };
+
 const AppDataSource = new DataSource({
   type: "postgres",
   url: process.env.DATABASE_URL,
@@ -16,10 +21,8 @@ const AppDataSource = new DataSource({
   migrations: [],
   subscribers: [],
 
-  // Enable SSL/TLS for PostgreSQL (required by Render)
-  ssl: process.env.DATABASE_URL && (process.env.DATABASE_URL.includes("localhost") || process.env.DATABASE_URL.includes("127.0.0.1")) ? false : {
-    rejectUnauthorized: false
-  }
+  ssl: sslConfig,
+  extra: { ssl: sslConfig },
 });
 
 module.exports = { AppDataSource };
